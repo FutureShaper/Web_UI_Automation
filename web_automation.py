@@ -66,13 +66,19 @@ class WebAutomation:
         return self
     
     def click_at_coordinates(self, x: int, y: int, delay: float = 1.0):
-        """Click at specific pixel coordinates."""
+        """Click at specific pixel coordinates (relative to top-left of the page body)."""
         if not self.driver or not self.action_chains:
             raise RuntimeError("Browser not started. Call start_browser() first.")
         
-        # Move to coordinates and click using absolute offset from the top-left of the body element
-        body = self.driver.find_element(By.TAG_NAME, "body")
-        self.action_chains.move_to_element_with_offset(body, x, y).click().perform()
+        # Cache the body element if not already cached
+        if self._body_element is None:
+            try:
+                self._body_element = self.driver.find_element(By.TAG_NAME, "body")
+            except Exception as e:
+                raise RuntimeError("Could not find <body> element for coordinate clicking.") from e
+        
+        # Move to top-left of body, then offset by (x, y) and click
+        self.action_chains.move_to_element_with_offset(self._body_element, 0, 0).move_by_offset(x, y).click().perform()
         
         # Wait for the specified delay
         if delay > 0:

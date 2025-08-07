@@ -38,11 +38,28 @@ def run_automation_from_config(config_file: str, headless: bool = False):
     if not clicks:
         print("Error: No clicks defined in configuration.")
         sys.exit(1)
-    
+
+    # Validate each click entry
+    for idx, click in enumerate(clicks):
+        if not isinstance(click, dict):
+            print(f"Error: Click #{idx+1} is not a valid object: {click}")
+            sys.exit(1)
+        if 'x' not in click or 'y' not in click:
+            print(f"Error: Click #{idx+1} missing 'x' or 'y' field: {click}")
+            sys.exit(1)
+        if not (isinstance(click['x'], int) or isinstance(click['x'], float)):
+            print(f"Error: Click #{idx+1} 'x' coordinate is not a number: {click['x']}")
+            sys.exit(1)
+        if not (isinstance(click['y'], int) or isinstance(click['y'], float)):
+            print(f"Error: Click #{idx+1} 'y' coordinate is not a number: {click['y']}")
+            sys.exit(1)
+        if 'delay' in click and not (isinstance(click['delay'], int) or isinstance(click['delay'], float)):
+            print(f"Error: Click #{idx+1} 'delay' is not a number: {click['delay']}")
+            sys.exit(1)
+
     # Create click sequence
     sequence = ClickSequence(sequence_name)
     sequence.add_clicks(clicks)
-    
     # Run automation
     with WebAutomation(headless=headless) as automation:
         automation.start_browser(url)

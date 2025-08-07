@@ -48,7 +48,7 @@ class WebAutomation:
                     WebAutomation._driver_path = system_chromedriver
                 else:
                     WebAutomation._driver_path = ChromeDriverManager().install()
-            except Exception:
+            except ImportError:
                 # Fallback to ChromeDriverManager if system driver not available
                 WebAutomation._driver_path = ChromeDriverManager().install()
         service = Service(WebAutomation._driver_path)

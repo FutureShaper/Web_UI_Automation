@@ -37,7 +37,9 @@ class WebAutomation:
         options.add_experimental_option('useAutomationExtension', False)
         
         # Setup Chrome driver
-        service = Service(ChromeDriverManager().install())
+        if WebAutomation._driver_path is None:
+            WebAutomation._driver_path = ChromeDriverManager().install()
+        service = Service(WebAutomation._driver_path)
         self.driver = webdriver.Chrome(service=service, options=options)
         self.action_chains = ActionChains(self.driver)
         

@@ -119,8 +119,13 @@ def run_recording_mode():
                 """)
                 if not is_recording:
                     break
-            except:
-                # Browser might be closed or error occurred
+            except JavascriptException as e:
+                # Handle case where window.clickRecorder is not initialized
+                print("Warning: window.clickRecorder is not initialized yet. Waiting for initialization...")
+                continue
+            except Exception as e:
+                # Browser might be closed or other error occurred
+                print(f"Error during recording check: {e}")
                 break
         
         # Stop recording and get clicks

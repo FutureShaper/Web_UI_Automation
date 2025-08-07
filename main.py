@@ -82,12 +82,19 @@ def run_interactive_mode():
     if not url:
         url = "about:blank"
     
-    loops = input("Number of loops (default: 1): ").strip()
-    try:
-        loops = int(loops) if loops else 1
-    except ValueError:
-        loops = 1
-    
+    while True:
+        loops_input = input("Number of loops (default: 1): ").strip()
+        if not loops_input:
+            loops = 1
+            break
+        try:
+            loops = int(loops_input)
+            if loops < 1:
+                print("Please enter a positive integer for loops.")
+                continue
+            break
+        except ValueError:
+            print("Invalid input. Please enter a valid integer for loops.")
     headless = input("Run in headless mode? (y/N): ").strip().lower() == 'y'
     
     # Create sequence

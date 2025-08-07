@@ -94,7 +94,8 @@ class WebAutomation:
                 'clientX': {x},
                 'clientY': {y}
             }});
-            document.elementFromPoint({x}, {y}).dispatchEvent(event);
+            var element = document.elementFromPoint({x}, {y});
+            if (element) element.dispatchEvent(event);
         """)
         
         # Wait for the specified delay

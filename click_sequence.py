@@ -3,13 +3,13 @@ Click sequence management for web UI automation.
 Handles sequences of clicks with pixel coordinates and timing.
 """
 import time
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 
 
 class ClickAction:
     """Represents a single click action with coordinates and optional delay."""
     
-    def __init__(self, x: int, y: int, delay: float = 1.0):
+    def __init__(self, x: Union[int, float], y: Union[int, float], delay: float = 1.0):
         self.x = x
         self.y = y
         self.delay = delay

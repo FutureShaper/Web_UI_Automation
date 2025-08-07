@@ -1,0 +1,21 @@
+{
+  "name": "Local Test Sequence",
+  "loops": 2,
+  "url": "data:text/html,<html><body style='margin:0;padding:20px;'><h1>Test Page for Automation</h1><p>This is a test page for web automation.</p><button onclick='alert(\"Clicked!\")' style='position:absolute;left:100px;top:100px;width:200px;height:50px;'>Click Me</button><div style='position:absolute;left:350px;top:200px;width:100px;height:100px;background:blue;color:white;text-align:center;line-height:100px;'>Target</div></body></html>",
+  "window_size": {
+    "width": 800,
+    "height": 600
+  },
+  "clicks": [
+    {
+      "x": 200,
+      "y": 125,
+      "delay": 1.0
+    },
+    {
+      "x": 400,
+      "y": 250,
+      "delay": 1.0
+    }
+  ]
+}

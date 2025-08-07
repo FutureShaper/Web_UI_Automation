@@ -1,0 +1,26 @@
+{
+  "name": "Example Click Sequence",
+  "loops": 3,
+  "url": "https://example.com",
+  "window_size": {
+    "width": 1024,
+    "height": 768
+  },
+  "clicks": [
+    {
+      "x": 100,
+      "y": 200,
+      "delay": 1.5
+    },
+    {
+      "x": 300,
+      "y": 400,
+      "delay": 2.0
+    },
+    {
+      "x": 500,
+      "y": 300,
+      "delay": 1.0
+    }
+  ]
+}

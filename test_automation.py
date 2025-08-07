@@ -11,11 +11,11 @@ def test_basic_automation():
     """Test basic automation functionality."""
     print("Testing Web UI Automation...")
     
-    # Create a simple test sequence
+    # Create a simple test sequence  
     sequence = ClickSequence("Test Sequence")
-    sequence.add_click(100, 100, 0.5)
-    sequence.add_click(200, 200, 0.5)
-    sequence.add_click(300, 300, 0.5)
+    sequence.add_click(50, 50, 0.5)    # Within bounds
+    sequence.add_click(100, 100, 0.5)  # Within bounds  
+    sequence.add_click(150, 150, 0.5)  # Within bounds
     
     print(f"Created sequence: {sequence}")
     print(f"Number of actions: {len(sequence)}")

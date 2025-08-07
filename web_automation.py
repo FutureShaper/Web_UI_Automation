@@ -40,7 +40,17 @@ class WebAutomation:
         
         # Setup Chrome driver
         if WebAutomation._driver_path is None:
-            WebAutomation._driver_path = ChromeDriverManager().install()
+            try:
+                # Try to use system ChromeDriver first
+                import shutil
+                system_chromedriver = shutil.which('chromedriver')
+                if system_chromedriver:
+                    WebAutomation._driver_path = system_chromedriver
+                else:
+                    WebAutomation._driver_path = ChromeDriverManager().install()
+            except Exception:
+                # Fallback to ChromeDriverManager if system driver not available
+                WebAutomation._driver_path = ChromeDriverManager().install()
         service = Service(WebAutomation._driver_path)
         self.driver = webdriver.Chrome(service=service, options=options)
         self.action_chains = ActionChains(self.driver)
@@ -66,19 +76,13 @@ class WebAutomation:
         return self
     
     def click_at_coordinates(self, x: int, y: int, delay: float = 1.0):
-        """Click at specific pixel coordinates (relative to top-left of the page body)."""
+        """Click at specific pixel coordinates (relative to top-left of the viewport)."""
         if not self.driver or not self.action_chains:
             raise RuntimeError("Browser not started. Call start_browser() first.")
         
-        # Cache the body element if not already cached
-        if self._body_element is None:
-            try:
-                self._body_element = self.driver.find_element(By.TAG_NAME, "body")
-            except Exception as e:
-                raise RuntimeError("Could not find <body> element for coordinate clicking.") from e
-        
-        # Move to top-left of body, then offset by (x, y) and click
-        self.action_chains.move_to_element_with_offset(self._body_element, 0, 0).move_by_offset(x, y).click().perform()
+        # Move to coordinates and click using absolute offset from the top-left of the viewport
+        body = self.driver.find_element(By.TAG_NAME, "body")
+        self.action_chains.move_to_element_with_offset(body, 0, 0).move_by_offset(x, y).click().perform()
         
         # Wait for the specified delay
         if delay > 0:

@@ -57,11 +57,11 @@ def run_automation_from_config(config_file: str, headless: bool = False):
             print(f"Error: Click #{idx+1} 'delay' is not a number: {click['delay']}")
             sys.exit(1)
 
-    # Create click sequence
-    sequence = ClickSequence(sequence_name)
-    sequence.add_clicks(clicks)
     # Run automation
     with WebAutomation(headless=headless) as automation:
+        # Create click sequence
+        sequence = ClickSequence(sequence_name)
+        sequence.add_clicks(clicks)
         automation.start_browser(url)
         
         # Set window size if specified

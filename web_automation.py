@@ -66,11 +66,8 @@ class WebAutomation:
         if not self.driver or not self.action_chains:
             raise RuntimeError("Browser not started. Call start_browser() first.")
         
-        # Get the body element to use as reference for coordinates
-        body = self.driver.find_element(By.TAG_NAME, "body")
-        
-        # Move to coordinates and click
-        self.action_chains.move_to_element_with_offset(body, x, y).click().perform()
+        # Move to coordinates and click using absolute offset from current position
+        self.action_chains.move_by_offset(x, y).click().perform()
         
         # Wait for the specified delay
         if delay > 0:

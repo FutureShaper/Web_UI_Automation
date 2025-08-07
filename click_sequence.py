@@ -34,8 +34,10 @@ class ClickSequence:
     def add_clicks(self, clicks: List[Dict[str, Any]]):
         """Add multiple clicks from a list of dictionaries."""
         for click in clicks:
-            x = click.get('x', 0)
-            y = click.get('y', 0)
+            if 'x' not in click or 'y' not in click:
+                raise ValueError("Each click dictionary must contain 'x' and 'y' keys.")
+            x = click['x']
+            y = click['y']
             delay = click.get('delay', 1.0)
             self.add_click(x, y, delay)
         return self

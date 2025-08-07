@@ -16,6 +16,8 @@ from click_sequence import ClickSequence, ClickAction
 class WebAutomation:
     """Main automation class for web browser control and click automation."""
     
+    _driver_path = None  # Class attribute to cache ChromeDriver path
+    
     def __init__(self, headless: bool = False):
         self.driver: Optional[webdriver.Chrome] = None
         self.headless = headless

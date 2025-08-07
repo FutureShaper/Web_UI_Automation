@@ -6,6 +6,7 @@ Automate clicks in web browser using pixel coordinates with configurable delays 
 import json
 import argparse
 import sys
+import time
 from web_automation import WebAutomation
 from click_sequence import ClickSequence
 
@@ -70,6 +71,107 @@ def run_automation_from_config(config_file: str, headless: bool = False):
         
         # Execute the sequence
         automation.execute_click_sequence(sequence, loops)
+
+
+def run_recording_mode():
+    """Run automation in recording mode to capture clicks."""
+    print("Web UI Automation - Recording Mode")
+    print("==================================")
+    
+    # Get basic configuration
+    url = input("Enter URL to load for recording (or press Enter for blank page): ").strip()
+    if not url:
+        url = "about:blank"
+    
+    headless = input("Run in headless mode? (y/N): ").strip().lower() == 'y'
+    if headless:
+        print("Warning: Recording mode works best in non-headless mode for visual feedback.")
+        proceed = input("Continue with headless mode? (y/N): ").strip().lower() == 'y'
+        if not proceed:
+            headless = False
+    
+    print(f"\nStarting recording session on: {url}")
+    print("Instructions:")
+    print("1. Browser will open with the specified URL")
+    print("2. Click anywhere on the page to record clicks")
+    print("3. Red dots will appear where you click")
+    print("4. Press ESC key when done recording")
+    print("5. You'll be prompted to save the recorded sequence")
+    
+    input("Press Enter to start recording...")
+    
+    # Start recording
+    with WebAutomation(headless=headless) as automation:
+        automation.start_browser(url)
+        automation.start_recording_mode()
+        
+        # Wait for user to finish recording
+        print("\nRecording started! Click on the webpage and press ESC when done.")
+        print("Waiting for recording to complete...")
+        
+        # Poll for recording completion
+        while automation.recording_mode:
+            time.sleep(0.5)
+            try:
+                # Check if recording has stopped
+                is_recording = automation.driver.execute_script("""
+                    return window.clickRecorder ? window.clickRecorder.recording : false;
+                """)
+                if not is_recording:
+                    break
+            except:
+                # Browser might be closed or error occurred
+                break
+        
+        # Stop recording and get clicks
+        recorded_clicks = automation.stop_recording_mode()
+        
+        if not recorded_clicks:
+            print("No clicks were recorded.")
+            return
+        
+        print(f"\nRecorded {len(recorded_clicks)} clicks:")
+        for i, click in enumerate(recorded_clicks, 1):
+            print(f"  {i}. Click at ({click['x']}, {click['y']}) with {click['delay']:.1f}s delay")
+        
+        # Ask if user wants to save the recording
+        save_recording = input("\nSave this recording? (Y/n): ").strip().lower()
+        if save_recording != 'n':
+            # Get save options
+            name = input("Enter sequence name (default: 'Recorded Sequence'): ").strip()
+            if not name:
+                name = "Recorded Sequence"
+            
+            while True:
+                loops_input = input("Number of loops for automation (default: 1): ").strip()
+                if not loops_input:
+                    loops = 1
+                    break
+                try:
+                    loops = int(loops_input)
+                    if loops < 1:
+                        print("Please enter a positive integer for loops.")
+                        continue
+                    break
+                except ValueError:
+                    print("Invalid input. Please enter a valid integer for loops.")
+            
+            filename = input("Save to filename (default: 'recorded_config.json'): ").strip()
+            if not filename:
+                filename = "recorded_config.json"
+            if not filename.endswith('.json'):
+                filename += '.json'
+            
+            # Save the configuration
+            automation.save_recorded_clicks_to_config(filename, name, loops, url)
+            
+            # Ask if user wants to run the recorded sequence
+            run_now = input(f"\nRun the recorded sequence now? (y/N): ").strip().lower() == 'y'
+            if run_now:
+                print(f"Running recorded sequence '{name}' {loops} time(s)...")
+                sequence = automation.create_sequence_from_recorded_clicks(name)
+                automation.execute_click_sequence(sequence, loops)
+                print("Playback completed!")
 
 
 def run_interactive_mode():
@@ -147,10 +249,17 @@ def main():
         action='store_true',
         help='Run in interactive mode'
     )
+    parser.add_argument(
+        '-r', '--record',
+        action='store_true',
+        help='Run in recording mode to capture clicks'
+    )
     
     args = parser.parse_args()
     
-    if args.interactive:
+    if args.record:
+        run_recording_mode()
+    elif args.interactive:
         run_interactive_mode()
     elif args.config:
         run_automation_from_config(args.config, args.headless)
@@ -160,6 +269,7 @@ def main():
         print("\nExample usage:")
         print("  python main.py -c example_config.json")
         print("  python main.py --interactive")
+        print("  python main.py --record")
         print("  python main.py -c example_config.json --headless")
 
 

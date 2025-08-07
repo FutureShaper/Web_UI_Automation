@@ -5,6 +5,7 @@ A Python-based solution for automating clicks in web browsers using pixel coordi
 ## Features
 
 - 🖱️ **Precise pixel-based clicking** - Click at exact coordinates on web pages
+- 📹 **Click recording** - Record actual clicks on the browser to create automation sequences
 - ⏱️ **Configurable delays** - Set waiting time between clicks to allow browser response
 - 🔄 **Loop sequences** - Repeat click sequences n times
 - 🎯 **Multiple interfaces** - Command-line and interactive modes
@@ -26,6 +27,21 @@ pip install -r requirements.txt
 
 ## Usage
 
+### Recording Mode (NEW!)
+
+Record actual clicks on a webpage to create automation sequences:
+
+```bash
+python main.py --record
+```
+
+This will:
+1. Open a browser with your specified URL
+2. Show a recording indicator
+3. Capture clicks as you perform them (with visual feedback)
+4. Allow you to save the recorded sequence as a JSON config file
+5. Optionally run the recorded sequence immediately
+
 ### Command Line with Configuration File
 
 Create a JSON configuration file (see `example_config.json`) and run:
@@ -45,6 +61,14 @@ Run the automation in interactive mode to define clicks on-the-fly:
 
 ```bash
 python main.py --interactive
+```
+
+### Recording Mode
+
+Record clicks directly on a webpage:
+
+```bash
+python main.py --record
 ```
 
 ### Configuration File Format
@@ -79,10 +103,18 @@ python main.py --interactive
 from web_automation import WebAutomation
 from click_sequence import ClickSequence
 
-# Create a click sequence
+# Option 1: Create a click sequence manually
 sequence = ClickSequence("My Automation")
 sequence.add_click(100, 200, 1.0)  # x, y, delay
 sequence.add_click(300, 400, 1.5)
+
+# Option 2: Record clicks and create sequence
+with WebAutomation(headless=False) as automation:
+    automation.start_browser("https://example.com")
+    automation.start_recording_mode()
+    # ... user clicks on browser ...
+    recorded_clicks = automation.stop_recording_mode()
+    sequence = automation.create_sequence_from_recorded_clicks("Recorded Sequence")
 
 # Run automation
 with WebAutomation(headless=False) as automation:
